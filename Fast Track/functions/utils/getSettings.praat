@@ -43,6 +43,9 @@ procedure getSettings
   if number_of_formants$ == "4"
     number_of_formants = 2
   endif
+  if number_of_formants$ == "5"
+    number_of_formants = 3
+  endif
 
   basis_functions$ = Get string: 10
 
@@ -94,10 +97,17 @@ procedure getSettings
   minimum_F4_frequency_value = number(minimum_F4_frequency_value$)
 
   ###
-  enable_rhotic_heuristic$ = Get string: 11
+  enable_F5_frequency_heuristic$ = Get string: 11
+  enable_F5_frequency_heuristic = number(enable_F5_frequency_heuristic$)
+
+  minimum_F5_frequency_value$ = Get string: 12
+  minimum_F5_frequency_value = number(minimum_F5_frequency_value$)
+
+  ###
+  enable_rhotic_heuristic$ = Get string: 13
   enable_rhotic_heuristic = number(enable_rhotic_heuristic$)
  
-  enable_F3F4_proximity_heuristic$ = Get string: 12
+  enable_F3F4_proximity_heuristic$ = Get string: 14
   enable_F3F4_proximity_heuristic = number(enable_F3F4_proximity_heuristic$)
 
   removeObject: .settings

@@ -10,6 +10,7 @@ beginPause: "Set Parameters"
 	optionMenu: "Number of formants", number_of_formants
 						option: "3"
 						option: "4"
+						option: "5"
     positive: "Number of coefficients for formant prediction:", number_of_coefficients_for_formant_prediction
 	boolean: "save formant", 0 ;
 	boolean: "return table", 1

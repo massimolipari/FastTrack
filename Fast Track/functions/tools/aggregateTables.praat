@@ -8,6 +8,7 @@ procedure aggregateTables
     optionMenu: "Number of formants:", number_of_formants
   			option: "3"
   			option: "4"
+        option: "5"
     optionMenu: "Number of bins:", number_of_bins
   			option: "1"
   			option: "3"

@@ -114,8 +114,11 @@ procedure trackAutoselect: .snd, .folder$, .lowest_analysis_frequency, .highest_
       .f1coeffs# = f1coeffs#
       .f2coeffs# = f2coeffs#
       .f3coeffs# = f3coeffs#
-      if .number_of_formants == 4
+      if .number_of_formants >= 4
         .f4coeffs# = f4coeffs#
+      endif
+      if .number_of_formants == 5
+        .f5coeffs# = f5coeffs#
       endif
     endif 
     

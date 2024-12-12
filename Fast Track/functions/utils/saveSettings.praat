@@ -73,11 +73,17 @@ procedure saveSettings
   minimum_F4_frequency_value$ = string$(minimum_F4_frequency_value)
   Set string: 10, minimum_F4_frequency_value$
 
+  enable_F5_frequency_heuristic$ = string$(enable_F5_frequency_heuristic)
+  Set string: 11, enable_F5_frequency_heuristic$
+
+  minimum_F5_frequency_value$ = string$(minimum_F5_frequency_value)
+  Set string: 12, minimum_F5_frequency_value$
+
   enable_rhotic_heuristic$ = string$(enable_rhotic_heuristic)
-  Set string: 11, enable_rhotic_heuristic$
+  Set string: 13, enable_rhotic_heuristic$
 
   enable_F3F4_proximity_heuristic$ = string$(enable_F3F4_proximity_heuristic)
-  Set string: 12, enable_F3F4_proximity_heuristic$
+  Set string: 14, enable_F3F4_proximity_heuristic$
 
   Save as raw text file: "../settings/heuristics.txt"
   removeObject: .tmp_str

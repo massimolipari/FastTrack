@@ -9,13 +9,11 @@ procedure findError .fr, .number_of_coefficients_for_formant_prediction, .number
   Rename: "output"
   number_of_frames = Get number of rows
   Remove column: "nformants"
-  nocheck Remove column: "F5(Hz)"
-  nocheck Remove column: "B5(Hz)"
   nocheck Remove column: "F6(Hz)"
   nocheck Remove column: "B6(Hz)"
   Set column label (label): "time(s)", "time"
 
-  for .i from 1 to 4
+  for .i from 1 to 5
     Set column label (label): "F"+string$(.i)+"(Hz)", "f"+string$(.i)
     Set column label (label): "B"+string$(.i)+"(Hz)", "b"+string$(.i)
   endfor
@@ -23,14 +21,25 @@ procedure findError .fr, .number_of_coefficients_for_formant_prediction, .number
   if .number_of_formants == 3
     Remove column: "b4"
     Remove column: "f4"
+    Remove column: "b5"
+    Remove column: "f5"
+  endif
+
+  if .number_of_formants == 4
+    Remove column: "b5"
+    Remove column: "f5"
   endif
 
   Append column: "f1p"
   Append column: "f2p"
   Append column: "f3p"
 
-  if .number_of_formants == 4
+  if .number_of_formants >= 4
     Append column: "f4p"
+  endif
+
+  if .number_of_formants == 5
+    Append column: "f5p"
   endif
 
   removeObject: .tmp_tbl
@@ -57,8 +66,11 @@ procedure findError .fr, .number_of_coefficients_for_formant_prediction, .number
   f1coeffs# = zero# (.number_of_coefficients_for_formant_prediction+1)
   f2coeffs# = zero# (.number_of_coefficients_for_formant_prediction+1)
   f3coeffs# = zero# (.number_of_coefficients_for_formant_prediction+1)
-  if .number_of_formants == 4
+  if .number_of_formants >= 4
     f4coeffs# = zero# (.number_of_coefficients_for_formant_prediction+1)
+  endif
+  if .number_of_formants == 5
+    f5coeffs# = zero# (.number_of_coefficients_for_formant_prediction+1)
   endif
 
   for .fnum from 1 to .number_of_formants
@@ -88,9 +100,13 @@ procedure findError .fr, .number_of_coefficients_for_formant_prediction, .number
   #Formula... error2 abs(self) * self[row,"b2"]
   #Formula... error3 abs(self) * self[row,"b3"]
 
-  if .number_of_formants == 4
+  if .number_of_formants >= 4
     Formula: "error4", "abs(self)"
     #Formula... error4 abs(self) * self[row,"b4"]
+  endif
+  if .number_of_formants >= 5
+    Formula: "error5", "abs(self)"
+    #Formula... error5 abs(self) * self[row,"b5"]
   endif
   ;.tmp = Get quantile: "error1", 0.5
   .tmp = Get mean: "error1"
@@ -101,10 +117,15 @@ procedure findError .fr, .number_of_coefficients_for_formant_prediction, .number
   ;.tmp = Get quantile: "error3", 0.5
   .tmp = Get mean: "error3"
   formantError#[3] = round((.tmp)*10)/10
-  if .number_of_formants == 4
+  if .number_of_formants >= 4
     ;.tmp = Get quantile: "error4", 0.5
     .tmp = Get mean: "error4"
     formantError#[4] = round((.tmp)*10)/10
+  endif
+  if .number_of_formants == 5
+    ;.tmp = Get quantile: "error5", 0.5
+    .tmp = Get mean: "error5"
+    formantError#[5] = round((.tmp)*10)/10
   endif
   
 
@@ -144,6 +165,23 @@ procedure findError .fr, .number_of_coefficients_for_formant_prediction, .number
     tmp4= Get quantile: "f4", 0.5
     if tmp4 < minimum_F4_frequency_value and enable_F4_frequency_heuristic == 1
       formantError#[4] = formantError#[4] + 10000
+    endif
+    if ((tmp2-tmp1) < 1500) and ((tmp4-tmp3) < 500) and (enable_F3F4_proximity_heuristic == 1)
+      formantError#[4] = formantError#[4] + 10000
+    endif
+  endif
+
+  if .number_of_formants == 5
+    tmp1 = Get quantile: "f1", 0.5
+    tmp2 = Get quantile: "f2", 0.5
+    tmp3 = Get quantile: "f3", 0.5
+    tmp4 = Get quantile: "f4", 0.5
+    tmp5 = Get quantile: "f5", 0.5
+    if tmp4 < minimum_F4_frequency_value and enable_F4_frequency_heuristic == 1
+      formantError#[4] = formantError#[4] + 10000
+    endif
+    if tmp5 < minimum_F5_frequency_value and enable_F5_frequency_heuristic == 1
+      formantError#[5] = formantError#[5] + 10000
     endif
     if ((tmp2-tmp1) < 1500) and ((tmp4-tmp3) < 500) and (enable_F3F4_proximity_heuristic == 1)
       formantError#[4] = formantError#[4] + 10000

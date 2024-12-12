@@ -74,6 +74,7 @@ optionMenu: "What to track:", what_to_track
 	optionMenu: "Number of formants", number_of_formants
 		option: "3"
 		option: "4"
+    option: "5"
   positive: "Maximum plotting frequency (Hz): ", maximum_plotting_frequency
 	optionMenu: "Image", 1
 	  option: "Show image of winner"
@@ -187,9 +188,13 @@ appendInfoLine: "F2 coefficients: "
 appendInfoLine: trackAutoselect.f2coeffs#
 appendInfoLine: "F3 coefficients: "
 appendInfoLine: trackAutoselect.f3coeffs#
-if number_of_formants == 4
+if number_of_formants >= 4
   appendInfoLine: "F4 coefficients: "
   appendInfoLine: trackAutoselect.f4coeffs#
+endif
+if number_of_formants == 5
+  appendInfoLine: "F5 coefficients: "
+  appendInfoLine: trackAutoselect.f5coeffs#
 endif
 appendInfoLine: ""
 appendInfoLine: "The first number in each row (the intercept) is a good estimate of the"

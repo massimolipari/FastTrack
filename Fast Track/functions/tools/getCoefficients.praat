@@ -76,6 +76,24 @@ procedure getCoefficients autorun
       @stringToVector: .tmp$
       f4coeffs# = stringToVector_output#
     endif
+    if number_of_formants == 5
+      f5coeffs# = zero#(number_of_coefficients_for_formant_prediction + 1)
+      .tmp$ = Get string: 20
+      @stringToVector: .tmp$
+      f1coeffs# = stringToVector_output#
+      .tmp$ = Get string: 21
+      @stringToVector: .tmp$
+      f2coeffs# = stringToVector_output#
+      .tmp$ = Get string: 22
+      @stringToVector: .tmp$
+      f3coeffs# = stringToVector_output#
+      .tmp$ = Get string: 23
+      @stringToVector: .tmp$
+      f4coeffs# = stringToVector_output#
+      .tmp$ = Get string: 24
+      @stringToVector: .tmp$
+      f5coeffs# = stringToVector_output#
+    endif
 
     selectObject: .output
     Set string value... .iii file '.basename$'
@@ -83,8 +101,11 @@ procedure getCoefficients autorun
       Set numeric value: .iii, "c1"+string$(.i), f1coeffs#[.i]
       Set numeric value: .iii, "c2"+string$(.i), f2coeffs#[.i]
       Set numeric value: .iii, "c3"+string$(.i), f3coeffs#[.i]
-      if number_of_formants == 4
+      if number_of_formants >= 4
         Set numeric value: .iii, "c4"+string$(.i), f4coeffs#[.i]
+      endif
+      if number_of_formants == 5
+        Set numeric value: .iii, "c5"+string$(.i), f5coeffs#[.i]
       endif
     endfor
     removeObject: .info

@@ -10,6 +10,7 @@ procedure editFolder
       optionMenu: "Number of formants", number_of_formants
               option: "3"
               option: "4"
+              option: "5"
       boolean: "save formant", 1 ;
       boolean: "save csv", 1
       boolean: "save image", 1

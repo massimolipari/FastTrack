@@ -31,8 +31,12 @@ procedure autoSelectFolder
   winf2coeffs# = zero# (number_of_coefficients_for_formant_prediction+1)
   winf3coeffs# = zero# (number_of_coefficients_for_formant_prediction+1)
   
-  if number_of_formants == 4
+  if number_of_formants >= 4
     winf4coeffs# = zero# (number_of_coefficients_for_formant_prediction+1)
+  endif
+
+  if number_of_formants == 5
+    winf5coeffs# = zero# (number_of_coefficients_for_formant_prediction+1)
   endif
 
   ## table containing best analysis according to automati selection
@@ -41,6 +45,9 @@ procedure autoSelectFolder
   endif
   if number_of_formants == 4
     Create Table with column names: "winners", .nfiles, "file winner F1 F2 F3 F4 edit"
+  endif
+  if number_of_formants == 5
+    Create Table with column names: "winners", .nfiles, "file winner F1 F2 F3 F4 F5 edit"
   endif
   ## comparison plot layout information
   .width = 2.85
@@ -79,14 +86,20 @@ procedure autoSelectFolder
     .f1Error# = zero#(number_of_steps)
     .f2Error# = zero#(number_of_steps)
     .f3Error# = zero#(number_of_steps)
-    if number_of_formants == 4
+    if number_of_formants >= 4
       .f4Error# = zero#(number_of_steps)
+    endif
+    if number_of_formants == 5
+      .f5Error# = zero#(number_of_steps)
     endif
     formantError# = zero#(4)
 
     ## to keep track of f4 intercept for roving f4 option
     .f4ints# = zero#(number_of_steps)
     .f4bws# = zero#(number_of_steps)
+
+    .f5ints# = zero#(number_of_steps)
+    .f5bws# = zero#(number_of_steps)
 
 
     .winner = 0
@@ -145,8 +158,11 @@ procedure autoSelectFolder
       .f1Error#[.z] = formantError#[1]
       .f2Error#[.z] = formantError#[2]
       .f3Error#[.z] = formantError#[3]
-      if number_of_formants == 4
+      if number_of_formants >= 4
         .f4Error#[.z] = formantError#[4]
+      endif
+      if number_of_formants == 5
+        .f5Error#[.z] = formantError#[5]
       endif
 
       selectObject: all_errors
@@ -155,13 +171,19 @@ procedure autoSelectFolder
       #.f4ints#[.z] = f4coeffs#[1]
       #.f4bws#[.z] = f4bandwidth
 
+      #.f5ints#[.z] = f5coeffs#[1]
+      #.f5bws#[.z] = f5bandwidth
+
       # creates regression information text files
       appendFileLine: folder$ + "/regression_infos/" + .basename$ + ".txt", formantError#
       appendFileLine: folder$ + "/regression_infos/" + .basename$ + ".txt", f1coeffs#
       appendFileLine: folder$ + "/regression_infos/" + .basename$ + ".txt", f2coeffs#
       appendFileLine: folder$ + "/regression_infos/" + .basename$ + ".txt", f3coeffs#
-      if number_of_formants == 4
+      if number_of_formants >= 4
         appendFileLine: folder$ + "/regression_infos/" + .basename$ + ".txt", f4coeffs#
+      endif
+      if number_of_formants == 5
+        appendFileLine: folder$ + "/regression_infos/" + .basename$ + ".txt", f5coeffs#
       endif
       
       # for winning f3 intercept
@@ -177,8 +199,11 @@ procedure autoSelectFolder
           winf1coeffs#[.jj] = f1coeffs#[.jj]
           winf2coeffs#[.jj] = f2coeffs#[.jj]
           winf3coeffs#[.jj] = f3coeffs#[.jj]
-          if number_of_formants == 4
+          if number_of_formants >= 4
             winf4coeffs#[.jj] = f4coeffs#[.jj]
+          endif
+          if number_of_formants == 5
+            winf5coeffs#[.jj] = f5coeffs#[.jj]
           endif
         endfor
         if save_csvs = 1
@@ -228,6 +253,19 @@ procedure autoSelectFolder
     #  endif
     #endfor
 
+    ### secondary selection of an independent F5 winner
+    #.f5winner = 0
+    #.minf5error = 9999999999
+    # go through again and find winning f5. above 2900 and 55 Hz above F4 and bw under 900 and sharpests
+    #for .z from 1 to number_of_steps
+    #  #if (.f5bws#[.z] < .minf5error) and ((.f5ints#[.z]-winf4)>450)
+   	#  if (.f5Error#[.z] < .minf5error) and ((.f5ints#[.z]-winf4)>450)
+    #    .minf5error = .f5Error#[.z]
+    #    #.minf5error = .f5bws#[.z]
+    #    .f5winner = .z
+    #  endif
+    #endfor
+
 
     ##########################################################################################################
 
@@ -263,10 +301,14 @@ procedure autoSelectFolder
     Set numeric value... .ii F1 .winner
     Set numeric value... .ii F2 .winner
     Set numeric value... .ii F3 .winner
-    if number_of_formants == 4
+    if number_of_formants >= 4
   	   #Set numeric value... .ii F4 .f4winner
   	   Set numeric value... .ii F4 .winner
     endif
+    if number_of_formants >= 5
+      #Set numeric value... .ii F5 .f5winner
+      Set numeric value... .ii F5 .winner
+   endif
     Set numeric value... .ii edit 0
 
     ## add information to info file
@@ -289,19 +331,28 @@ procedure autoSelectFolder
     if number_of_formants == 4
     appendFileLine: folder$ + "/infos/" + .basename$ + "_info.txt", "Errors (total,f1,f2,f3,f4): "
     endif
+    if number_of_formants == 5
+      appendFileLine: folder$ + "/infos/" + .basename$ + "_info.txt", "Errors (total,f1,f2,f3,f4,f5): "
+      endif
     appendFileLine: folder$ + "/infos/" + .basename$ + "_info.txt", .totalerror#
     appendFileLine: folder$ + "/infos/" + .basename$ + "_info.txt", .f1Error#
     appendFileLine: folder$ + "/infos/" + .basename$ + "_info.txt", .f2Error#
     appendFileLine: folder$ + "/infos/" + .basename$ + "_info.txt", .f3Error#
-    if number_of_formants == 4
+    if number_of_formants >= 4
       appendFileLine: folder$ + "/infos/" + .basename$ + "_info.txt", .f4Error#
+    endif
+    if number_of_formants == 5
+      appendFileLine: folder$ + "/infos/" + .basename$ + "_info.txt", .f5Error#
     endif
     appendFileLine: folder$ + "/infos/" + .basename$ + "_info.txt", "Coefficients are (row-wise by formant):"
     appendFileLine: folder$ + "/infos/" + .basename$ + "_info.txt", winf1coeffs#
     appendFileLine: folder$ + "/infos/" + .basename$ + "_info.txt", winf2coeffs#
     appendFileLine: folder$ + "/infos/" + .basename$ + "_info.txt", winf3coeffs#
-    if number_of_formants == 4
+    if number_of_formants >= 4
       appendFileLine: folder$ + "/infos/" + .basename$ + "_info.txt", winf4coeffs#
+    endif
+    if number_of_formants == 5
+      appendFileLine: folder$ + "/infos/" + .basename$ + "_info.txt", winf5coeffs#
     endif
 
     ## save image if desired

@@ -25,11 +25,17 @@ procedure editTracks: fr
       .t3n = Get value... 2 f3
       .t4 = .t3
       .t4n = .t3n
-      if number_of_formants == 4
+      .t5 = .t3
+      .t5n = .t3n
+      if number_of_formants >= 4
         .t4 = Get value... 1 f4
         .t4n = Get value... 2 f4
       endif
-      if (.t1-.t1n) = 0 or (.t2-.t2n) = 0 or (.t3-.t3n) = 0 or (.t4-.t4n) = 0
+      if number_of_formants == 5
+        .t5 = Get value... 1 f5
+        .t5n = Get value... 2 f5
+      endif
+      if (.t1-.t1n) = 0 or (.t2-.t2n) = 0 or (.t3-.t3n) = 0 or (.t4-.t4n) = 0 or (.t5-.t5n) = 0
         Remove row: 1
         .nrows = Get number of rows
       else
@@ -49,11 +55,17 @@ procedure editTracks: fr
       .t3n = Get value... .nrows-1 f3
       .t4 = .t3
       .t4n = .t3n
-      if number_of_formants == 4
+      .t5 = .t3
+      .t5n = .t3n
+      if number_of_formants >= 4
         .t4 = Get value... 1 f4
         .t4n = Get value... 2 f4
       endif
-      if (.t1-.t1n) = 0 or (.t2-.t2n) = 0 or (.t3-.t3n) = 0 or (.t4-.t4n) = 0
+      if number_of_formants == 5
+        .t5 = Get value... 1 f5
+        .t5n = Get value... 2 f5
+      endif
+      if (.t1-.t1n) = 0 or (.t2-.t2n) = 0 or (.t3-.t3n) = 0 or (.t4-.t4n) = 0 or (.t5-.t5n) = 0
         Remove row: .nrows
        .nrows = Get number of rows
       else

@@ -41,6 +41,8 @@ while clicked <> 1
     positive: "Maximum F3 bandwidth value:", maximum_F3_bandwidth_value
 	  boolean: "Enable F4 frequency heuristic:", enable_F4_frequency_heuristic
     positive: "Minimum F4 frequency value:", minimum_F4_frequency_value
+	  boolean: "Enable F5 frequency heuristic:", enable_F5_frequency_heuristic
+    positive: "Minimum F5 frequency value:", minimum_F5_frequency_value
     boolean: "Enable rhotic heuristic:", enable_rhotic_heuristic
     boolean: "Enable F3F4 proximity heuristic:", enable_F3F4_proximity_heuristic
 	endif

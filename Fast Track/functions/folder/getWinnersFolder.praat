@@ -36,6 +36,8 @@ procedure getWinnersFolder
   winf2coeffs# = zero# (number_of_coefficients_for_formant_prediction+1)
   winf3coeffs# = zero# (number_of_coefficients_for_formant_prediction+1)
   winf4coeffs# = zero# (number_of_coefficients_for_formant_prediction+1)
+  winf5coeffs# = zero# (number_of_coefficients_for_formant_prediction+1)
+
 		
   ## counters involved in prediction of process duration
   daySecond = 0
@@ -76,9 +78,14 @@ procedure getWinnersFolder
 		.wf3 = Get value: .counter, "F3"
 		if number_of_formants == 3
 	  	.wf4 = .wf3
+      .wf5 = .wf3
 	  endif
-	  if number_of_formants == 4
+	  if number_of_formants >= 4
 	    .wf4 = Get value: .counter, "F4"
+      .wf5 = .wf4
+	  endif
+    if number_of_formants == 5
+	    .wf5 = Get value: .counter, "F5"
 	  endif
     if .winner > 0
       selectObject: .info
@@ -87,6 +94,9 @@ procedure getWinnersFolder
       endif
       if number_of_formants == 4
         Set string: 11, string$(.wf1)+" "+string$(.wf2)+" "+string$(.wf3)+" "+string$(.wf4)
+      endif
+      if number_of_formants == 5
+        Set string: 11, string$(.wf1)+" "+string$(.wf2)+" "+string$(.wf3)+" "+string$(.wf4)+" "+string$(.wf5)
       endif
       
       ##Optionally show progress
@@ -109,7 +119,7 @@ procedure getWinnersFolder
       .snd = Read from file: folder$ + "/sounds/" + .basename$ + ".wav"
 
       ##### This block is for the basic situation where all formants are from the same cutoff.
-      if (.winner = .wf1) & (.wf1 = .wf2) & (.wf3 = .wf3) & (.wf3 = .wf4)
+      if (.winner = .wf1) & (.wf1 = .wf2) & (.wf3 = .wf3) & (.wf3 = .wf4) & (.wf4 = .wf5)
 
         ## I should add heuristics here. do other check here and affect winners not errors. 
         ## add column in winners column where smoothest. was not chosen due to some reason. never need to redo analyses
@@ -165,8 +175,11 @@ procedure getWinnersFolder
                     Set numeric value: .counter, "F1", .winner
                     Set numeric value: .counter, "F2", .winner
                     Set numeric value: .counter, "F3", .winner
-                    if number_of_formants == 4
+                    if number_of_formants >= 4
                       Set numeric value: .counter, "F4", .winner
+                    endif
+                    if number_of_formants == 5
+                      Set numeric value: .counter, "F5", .winner
                     endif
                   endif								
                 endif ; end check for better candidate							
@@ -183,8 +196,11 @@ procedure getWinnersFolder
           winf1coeffs#[.jj] = f1coeffs#[.jj]
           winf2coeffs#[.jj] = f2coeffs#[.jj]
           winf3coeffs#[.jj] = f3coeffs#[.jj]
-          if number_of_formants == 4
+          if number_of_formants >= 4
             winf4coeffs#[.jj] = f4coeffs#[.jj]
+          endif
+          if number_of_formants == 5
+            winf5coeffs#[.jj] = f5coeffs#[.jj]
           endif
         endfor
         selectObject: "Table output"
@@ -198,12 +214,13 @@ procedure getWinnersFolder
       ##### This is for the more complicated situation where different formants are taken from different analyses.
       else
 
-        # read from the four formant files
+        # read from the five formant files
         .tmp_f1 = Read from file: folder$ + "/formants/"+ .basename$ + "_" + string$(.wf1) + "_.Formant"
         .number_of_frames = Get number of frames
         .tmp_f2 = Read from file: folder$ + "/formants/"+ .basename$ + "_" + string$(.wf2) + "_.Formant"
         .tmp_f3 = Read from file: folder$ + "/formants/"+ .basename$ + "_" + string$(.wf3) + "_.Formant"
         .tmp_f4 = Read from file: folder$ + "/formants/"+ .basename$ + "_" + string$(.wf4) + "_.Formant"
+        .tmp_f5 = Read from file: folder$ + "/formants/"+ .basename$ + "_" + string$(.wf5) + "_.Formant"
 
         for .j from 1 to .number_of_frames
           selectObject: .tmp_f1
@@ -225,7 +242,7 @@ procedure getWinnersFolder
             Formula (frequencies): "if row = 3 and col=" + string$(.j) +" then " + string$(.tf3) + " else self endif"
             Formula (bandwidths): "if row = 3 and col=" + string$(.j) +" then " + string$(.tb3) + " else self endif"
           endif
-          if (number_of_formants == 4) 
+          if (number_of_formants >= 4) 
             selectObject: .tmp_f4
             .tf4 = Get value at time: 4, .tmp_time, "hertz", "Linear"
             .tb4 = Get bandwidth at time: 4, .tmp_time, "hertz", "Linear"
@@ -233,6 +250,16 @@ procedure getWinnersFolder
               selectObject: .tmp_f1
               Formula (frequencies): "if row = 4 and col=" + string$(.j) +" then " + string$(.tf4) + " else self endif"
               Formula (bandwidths): "if row = 4 and col=" + string$(.j) +" then " + string$(.tb4) + " else self endif"
+            endif
+          endif
+          if (number_of_formants == 5) 
+            selectObject: .tmp_f5
+            .tf5 = Get value at time: 5, .tmp_time, "hertz", "Linear"
+            .tb5 = Get bandwidth at time: 5, .tmp_time, "hertz", "Linear"
+            if (.tf5 <> undefined)
+              selectObject: .tmp_f1
+              Formula (frequencies): "if row = 5 and col=" + string$(.j) +" then " + string$(.tf5) + " else self endif"
+              Formula (bandwidths): "if row = 5 and col=" + string$(.j) +" then " + string$(.tb5) + " else self endif"
             endif
           endif
         endfor
@@ -244,8 +271,11 @@ procedure getWinnersFolder
           winf1coeffs#[.jj] = f1coeffs#[.jj]
           winf2coeffs#[.jj] = f2coeffs#[.jj]
           winf3coeffs#[.jj] = f3coeffs#[.jj]
-          if number_of_formants == 4
+          if number_of_formants >= 4
             winf4coeffs#[.jj] = f4coeffs#[.jj]
+          endif
+          if number_of_formants == 5
+            winf5coeffs#[.jj] = f5coeffs#[.jj]
           endif
         endfor
         selectObject: "Table output"
@@ -268,7 +298,7 @@ procedure getWinnersFolder
 
         selectObject: "Table output"
         Save as comma-separated file: folder$ + "/csvs/"+ .basename$ + ".csv"
-        nocheck removeObject: .tmp_f1, .tmp_f2, .tmp_f3, .tmp_f4
+        nocheck removeObject: .tmp_f1, .tmp_f2, .tmp_f3, .tmp_f4, .tmp_f5
       endif
       #### alternate formant collection ends here
 
@@ -290,6 +320,9 @@ procedure getWinnersFolder
       if number_of_formants==4
         Set string: 11, string$(.cutoffs#[.wf1]) + " " + string$(.cutoffs#[.wf2]) + " " + string$(.cutoffs#[.wf3])+ " " + string$(.cutoffs#[.wf4])
       endif
+      if number_of_formants==5
+        Set string: 11, string$(.cutoffs#[.wf1]) + " " + string$(.cutoffs#[.wf2]) + " " + string$(.cutoffs#[.wf3])+ " " + string$(.cutoffs#[.wf4])+ " " + string$(.cutoffs#[.wf5])
+      endif
 
       if number_of_formants==3
         @vectorToString: winf1coeffs#
@@ -308,6 +341,18 @@ procedure getWinnersFolder
         Set string: 21, vectorToString_output$
         @vectorToString: winf4coeffs#
         Set string: 22, vectorToString_output$
+      endif
+      if number_of_formants==5
+        @vectorToString: winf1coeffs#
+        Set string: 20, vectorToString_output$
+        @vectorToString: winf2coeffs#
+        Set string: 21, vectorToString_output$
+        @vectorToString: winf3coeffs#
+        Set string: 22, vectorToString_output$
+        @vectorToString: winf4coeffs#
+        Set string: 23, vectorToString_output$
+        @vectorToString: winf5coeffs#
+        Set string: 24, vectorToString_output$
       endif
       Save as raw text file: folder$ + "/infos/" + .basename$ + "_info.txt"
 

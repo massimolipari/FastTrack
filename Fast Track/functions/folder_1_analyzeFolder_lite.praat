@@ -62,6 +62,7 @@ beginPause: "Set Parameters"
 	optionMenu: "Number of formants", number_of_formants
 		option: "3"
 		option: "4"
+    option: "5"
   positive: "Maximum plotting frequency (Hz): ", maximum_plotting_frequency
   optionMenu: "Number of bins:", number_of_bins
   			option: "1"
